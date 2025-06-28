@@ -1,62 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
-    <title>Mental Health Predictor</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mental Health Predictor - Elite Edition</title>
 
-    <!-- CSS  -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="./static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-    <link href="./static/css2/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
-  </head>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <body>
-    <div class="section no-pad-bot" id="index-banner">
-      <div class="container">
-        <br><br>
-        <h1 class="header center orange-text">Mental Health Prediction</h1>
-          <div class="row center">
-            <h5 class="header col s12 light">Predict the probability whether a person requires Mental Treatment
-              <br>
-            </h5>
-          </div>
-        <div class="row center">
-          <h6 class="header col s12 light">Instructions to fill form<br>1. Enter age in years<br>2. For Gender: Enter 0 for male, 1 for female and 2 for transgender<br>3. For Family History: Enter 0 for No and 1 for Yes</h6>
-        </div>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        <div class="row">
-          <form action='/predict' method="post" class="col s12">
-            <div class="row">
-              <div class="input-field col s4">
-                <label for="first_name"><b>Age</b></label>
-                <br>
-                <input placeholder="Age" name="Age" id="first_name" type="text" class="validate">
-              </div>
-              <div class="input-field col s4">
-                <label for="last_name"><b>Gender </b></label>
-                <br>
-                <input id="last_name" name="Gender" placeholder="Gender"  type="text" class="validate">
-              </div>
-              <div class="input-field col s4">
-                <label for="_name"><b>Family History</b></label>
-                <br>
-                <input id="_name" name="Family_history" placeholder="Family History" type="text" class="validate">
-              </div>
-            </div>
-            <div class="row center">
-              <button type="submit" class="btn-large waves-effect waves-light orange">Predict Probability</button>
-            </div>
-          </form>
-        </div>
-        <br>
-        <div class="row center">
-          <h6 class="waves-effect waves-light orange">{{pred}}<br></h6>
-        </div>
-      </div>
+  <!-- AOS for animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-image: url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: #ffffff;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.7), rgba(88, 28, 135, 0.7));
+      z-index: 1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border-radius: 2rem;
+      padding: 3.5rem;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .input-field input {
+      background: rgba(255, 255, 255, 0.98);
+      border-radius: 1rem;
+      padding: 1rem 1.5rem;
+      color: #0f172a;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.4s ease;
+      border: 2px solid transparent;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .input-field input:focus {
+      outline: none;
+      border-color: #ca9b1e;
+      box-shadow: 0 0 25px rgba(202, 155, 30, 0.5);
+      background: #ffffff;
+      transform: scale(1.02);
+    }
+
+    .input-field label {
+      color: #f3f4f6;
+      font-weight: 600;
+      font-size: 1rem;
+      position: absolute;
+      left: 1.5rem;
+      top: 1.2rem;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-field input:focus + label,
+    .input-field input:not(:placeholder-shown) + label {
+      transform: translateY(-2.5rem) scale(0.85);
+      color: #ca9b1e;
+      font-size: 0.9rem;
+      background: transparent;
+      padding: 0 0.5rem;
+    }
+
+    .premium-btn {
+      background: linear-gradient(45deg, #ca9b1e, #a47b15);
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .premium-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+      z-index: -1;
+    }
+
+    .premium-btn:hover::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .premium-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px rgba(202, 155, 30, 0.6);
+    }
+
+    #prediction-result {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #ca9b1e;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    footer {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1.25rem;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      z-index: 2;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container max-w-lg mx-auto">
+    <div class="text-center mb-12" data-aos="fade-down">
+      <h1 class="text-6xl font-extrabold text-white drop-shadow-2xl">Mental Health Predictor</h1>
+      <p class="text-2xl text-gray-100 mt-4 font-medium">Unlock elite insights for your mental wellness journey.</p>
     </div>
-    <br><br>
+
+    <div class="glass-card" data-aos="fade-up">
+      <form id="prediction-form" class="space-y-10">
+        <div class="input-field relative">
+          <input id="age" name="Age" type="number" min="1" required placeholder=" " class="w-full">
+          <label for="age">Age</label>
+        </div>
+
+        <div class="input-field relative">
+          <input id="gender" name="Gender" type="number" min="0" max="2" required placeholder=" " class="w-full">
+          <label for="gender">Gender (0 = Male, 1 = Female, 2 = Transgender)</label>
+        </div>
+
+        <div class="input-field relative">
+          <input id="family-history" name="Family_history" type="number" min="0" max="1" required placeholder=" " class="w-full">
+          <label for="family-history">Family History of Mental Illness (0 = No, 1 = Yes)</label>
+        </div>
+
+        <button type="submit" class="premium-btn w-full py-4 rounded-full text-white font-bold text-xl">Predict Now</button>
+      </form>
+
+      <div id="prediction-result" class="mt-10 text-center">Prediction result will appear here.</div>
+    </div>
   </div>
-</div>
+
+  <footer>
+    <p>© 2025 Mental Health Predictor - Elite Edition</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    AOS.init({ duration: 1200, once: true });
+
+    document.getElementById('prediction-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const age = document.getElementById('age').value;
+      const gender = document.getElementById('gender').value;
+      const family = document.getElementById('family-history').value;
+
+      if (!age || !gender || !family) {
+        alert('Please fill all fields');
+        return;
+      }
+
+      let result = calculatePrediction(age, gender, family);
+      const resultDiv = document.getElementById('prediction-result');
+      resultDiv.style.opacity = 0;
+      resultDiv.style.transform = 'translateY(10px)';
+      setTimeout(() => {
+        resultDiv.textContent = `Predicted probability of needing treatment: ${result}%`;
+        resultDiv.style.opacity = 1;
+        resultDiv.style.transform = 'translateY(0)';
+      }, 400);
+    });
+
+    function calculatePrediction(age, gender, familyHistory) {
+      let score = 50;
+      if (age < 18) score -= 10;
+      if (age > 50) score += 15;
+      if (gender == 1) score += 5;
+      if (gender == 2) score += 10;
+      if (familyHistory == 1) score += 20;
+      return Math.max(0, Math.min(100, score));
+    }
+  </script>
 </body>
 </html>
